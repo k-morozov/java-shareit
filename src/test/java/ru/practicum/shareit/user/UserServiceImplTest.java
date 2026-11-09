@@ -80,6 +80,25 @@ class UserServiceImplTest {
     }
 
     @Test
+    void updateIgnoresBlankName() {
+        UserDto ann = service.create(dto("Ann", "ann@mail.ru"));
+
+        UserDto updated = service.update(ann.getId(), dto("  ", null));
+
+        assertThat(updated.getName()).isEqualTo("Ann");
+    }
+
+    @Test
+    void updateIgnoresEmailWithoutAt() {
+        UserDto ann = service.create(dto("Ann", "ann@mail.ru"));
+
+        UserDto updated = service.update(ann.getId(), dto(null, "ann.mail.ru"));
+
+        assertThat(updated.getEmail()).isEqualTo("ann@mail.ru");
+        assertThat(service.getById(ann.getId()).getEmail()).isEqualTo("ann@mail.ru");
+    }
+
+    @Test
     void getUnknownThrowsNotFound() {
         assertThatThrownBy(() -> service.getById(42L)).isInstanceOf(NotFoundException.class);
     }
@@ -97,6 +116,11 @@ class UserServiceImplTest {
 
         assertThatThrownBy(() -> service.getById(ann.getId())).isInstanceOf(NotFoundException.class);
         assertThat(service.getAll()).isEmpty();
+    }
+
+    @Test
+    void deleteUnknownThrowsNotFound() {
+        assertThatThrownBy(() -> service.delete(42L)).isInstanceOf(NotFoundException.class);
     }
 
     @Test

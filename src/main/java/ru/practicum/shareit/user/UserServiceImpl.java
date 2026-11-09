@@ -29,11 +29,11 @@ public class UserServiceImpl implements UserService {
     public UserDto update(long id, UserDto userDto) {
         User user = getEntity(id);
         String newEmail = userDto.getEmail();
-        if (newEmail != null && !newEmail.equals(user.getEmail())) {
+        if (newEmail != null && newEmail.contains("@") && !newEmail.equals(user.getEmail())) {
             checkEmailIsFree(newEmail);
             user.setEmail(newEmail);
         }
-        if (userDto.getName() != null) {
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
             user.setName(userDto.getName());
         }
         User saved = userRepository.save(user);
@@ -55,12 +55,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(long id) {
+        getEntity(id);
         userRepository.deleteById(id);
         log.info("Deleted user id={}", id);
     }
 
-    @Override
-    public User getEntity(long id) {
+    private User getEntity(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
     }

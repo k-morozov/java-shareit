@@ -14,6 +14,4 @@ public interface UserService {
     List<UserDto> getAll();
 
     void delete(long id);
-
-    User getEntity(long id);
 }

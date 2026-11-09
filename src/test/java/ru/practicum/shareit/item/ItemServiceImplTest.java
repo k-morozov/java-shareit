@@ -22,8 +22,9 @@ class ItemServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(new InMemoryUserRepository());
-        itemService = new ItemServiceImpl(new InMemoryItemRepository(), userService);
+        InMemoryUserRepository userRepository = new InMemoryUserRepository();
+        userService = new UserServiceImpl(userRepository);
+        itemService = new ItemServiceImpl(new InMemoryItemRepository(), userRepository);
         ownerId = userService.create(UserDto.builder().name("Owner").email("owner@mail.ru").build()).getId();
         otherId = userService.create(UserDto.builder().name("Other").email("other@mail.ru").build()).getId();
     }
@@ -92,6 +93,16 @@ class ItemServiceImplTest {
         assertThat(updated.getName()).isEqualTo("Дрель 2");
         assertThat(updated.getDescription()).isEqualTo("Новая");
         assertThat(updated.getAvailable()).isTrue();
+    }
+
+    @Test
+    void updateIgnoresBlankNameAndDescription() {
+        ItemDto item = itemService.create(ownerId, dto("Дрель", "Ударная", true));
+
+        ItemDto updated = itemService.update(ownerId, item.getId(), dto("   ", "", null));
+
+        assertThat(updated.getName()).isEqualTo("Дрель");
+        assertThat(updated.getDescription()).isEqualTo("Ударная");
     }
 
     @Test
