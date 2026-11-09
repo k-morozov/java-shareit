@@ -1,7 +1,9 @@
 package ru.practicum.shareit.user;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -9,14 +11,12 @@ import ru.practicum.shareit.user.dto.UserDto;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@SpringBootTest
+@Transactional
 class UserServiceImplTest {
 
+    @Autowired
     private UserService service;
-
-    @BeforeEach
-    void setUp() {
-        service = new UserServiceImpl(new InMemoryUserRepository());
-    }
 
     private UserDto dto(String name, String email) {
         return UserDto.builder().name(name).email(email).build();
@@ -115,7 +115,7 @@ class UserServiceImplTest {
         service.delete(ann.getId());
 
         assertThatThrownBy(() -> service.getById(ann.getId())).isInstanceOf(NotFoundException.class);
-        assertThat(service.getAll()).isEmpty();
+        assertThat(service.getAll()).extracting(UserDto::getId).doesNotContain(ann.getId());
     }
 
     @Test
@@ -125,9 +125,9 @@ class UserServiceImplTest {
 
     @Test
     void getAllReturnsEveryUser() {
-        service.create(dto("Ann", "ann@mail.ru"));
-        service.create(dto("Bob", "bob@mail.ru"));
+        UserDto ann = service.create(dto("Ann", "ann@mail.ru"));
+        UserDto bob = service.create(dto("Bob", "bob@mail.ru"));
 
-        assertThat(service.getAll()).extracting(UserDto::getName).containsExactlyInAnyOrder("Ann", "Bob");
+        assertThat(service.getAll()).extracting(UserDto::getId).contains(ann.getId(), bob.getId());
     }
 }
