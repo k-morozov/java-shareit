@@ -65,6 +65,18 @@ class PatchValidationTest {
     }
 
     @Test
+    void patchUserWithEmailWithoutAtReturns400() throws Exception {
+        long userId = createUser();
+        String email = mapper.readTree(mvc.perform(get("/users/" + userId))
+                .andReturn().getResponse().getContentAsString()).get("email").asText();
+
+        mvc.perform(patch("/users/" + userId).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"ann.mail.ru\"}"))
+                .andExpect(status().isBadRequest());
+        mvc.perform(get("/users/" + userId)).andExpect(jsonPath("$.email").value(email));
+    }
+
+    @Test
     void patchItemWithBlankNameReturns400() throws Exception {
         long userId = createUser();
         long itemId = createItem(userId);

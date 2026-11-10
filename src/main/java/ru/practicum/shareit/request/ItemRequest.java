@@ -36,6 +36,7 @@ public class ItemRequest {
     @JoinColumn(name = "requestor_id", nullable = false)
     private User requestor;
 
+    @Builder.Default
     @Column(nullable = false)
-    private LocalDateTime created;
+    private LocalDateTime created = LocalDateTime.now();
 }

@@ -89,16 +89,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateIgnoresEmailWithoutAt() {
-        UserDto ann = service.create(dto("Ann", "ann@mail.ru"));
-
-        UserDto updated = service.update(ann.getId(), dto(null, "ann.mail.ru"));
-
-        assertThat(updated.getEmail()).isEqualTo("ann@mail.ru");
-        assertThat(service.getById(ann.getId()).getEmail()).isEqualTo("ann@mail.ru");
-    }
-
-    @Test
     void getUnknownThrowsNotFound() {
         assertThatThrownBy(() -> service.getById(42L)).isInstanceOf(NotFoundException.class);
     }

@@ -110,9 +110,10 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void createOwnItemIs404() {
+    void createOwnItemIs400() {
         assertThatThrownBy(() -> bookingService.create(ownerId, request(itemId, inDays(1), inDays(2))))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("Cannot book your own item");
     }
 
     @Test

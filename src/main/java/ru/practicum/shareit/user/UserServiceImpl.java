@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     public UserDto update(long id, UserDto userDto) {
         User user = getEntity(id);
         String newEmail = userDto.getEmail();
-        if (newEmail != null && newEmail.contains("@") && !newEmail.equals(user.getEmail())) {
+        if (newEmail != null && !newEmail.equals(user.getEmail())) {
             checkEmailIsFree(newEmail);
             user.setEmail(newEmail);
         }
